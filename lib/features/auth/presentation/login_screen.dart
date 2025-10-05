@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharmatrack/core/config/app_router.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -6,13 +7,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/dashboard');
+            Navigator.pushNamed(context, AppRouter.dashboard);
           },
-          child: const Text("Go to Dashboard"),
+          child: const Text('Go to Dashboard'),
         ),
       ),
     );
