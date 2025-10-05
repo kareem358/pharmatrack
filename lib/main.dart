@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'core/config/app_router.dart';
+import 'core/config/app_theme.dart';
 
 void main() {
   runApp(const PharmaTrackApp());
@@ -14,16 +14,19 @@ class PharmaTrackApp extends StatelessWidget {
     return MaterialApp(
       title: 'PharmaTrack',
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme, // 👈 Apply global theme
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: AppRouter.login,
     );
   }
 }
+
+
 
 /*
+
 import 'package:flutter/material.dart';
 import 'core/config/app_router.dart';
-
 
 void main() {
   runApp(const PharmaTrackApp());
@@ -42,8 +45,8 @@ class PharmaTrackApp extends StatelessWidget {
     );
   }
 }
+
 
 
 
 */
-
