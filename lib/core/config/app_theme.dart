@@ -1,4 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class AppTheme {
+  static final lightTheme = ThemeData(
+    primarySwatch: Colors.indigo,
+    scaffoldBackgroundColor: Colors.grey[50],
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.indigo,
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
+    textTheme: GoogleFonts.poppinsTextTheme(), // 👈 Add Google Font globally
+  );
+}
+
+
+
+/*
+import 'package:flutter/material.dart';
 import '../constants/app_colors.dar.dart';
 
 import '../constants/app_text_styles.dart';
@@ -25,3 +44,4 @@ class AppTheme {
     ),
   );
 }
+*/
