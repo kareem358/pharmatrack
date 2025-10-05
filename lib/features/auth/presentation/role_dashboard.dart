@@ -11,25 +11,40 @@ class RoleDashboard extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRouter.inventory),
-            child: const Text('Go to Inventory'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRouter.inventory),
+              child: const Text('Go to Inventory'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRouter.pos),
-            child: const Text('Go to POS'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRouter.pos),
+              child: const Text('Go to POS'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRouter.customers),
-            child: const Text('Go to Customers'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRouter.customers),
+              child: const Text('Go to Customers'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRouter.reports),
-            child: const Text('Go to Reports'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRouter.reports),
+              child: const Text('Go to Reports'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRouter.settingsRoute),
-            child: const Text('Go to Settings'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRouter.settingsRoute),
+              child: const Text('Go to Settings'),
+            ),
           ),
         ],
       ),
