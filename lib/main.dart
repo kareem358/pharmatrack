@@ -1,23 +1,49 @@
-import 'package:flutter/material.dart';
 
-import 'features/screens/home_screen.dart';
+import 'package:flutter/material.dart';
+import 'core/config/app_router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const PharmaTrackApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PharmaTrackApp extends StatelessWidget {
+  const PharmaTrackApp({super.key});
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'PharmaTrack',
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: AppRouter.generateRoute,
+      initialRoute: AppRouter.login,
     );
   }
 }
+
+/*
+import 'package:flutter/material.dart';
+import 'core/config/app_router.dart';
+
+
+void main() {
+  runApp(const PharmaTrackApp());
+}
+
+class PharmaTrackApp extends StatelessWidget {
+  const PharmaTrackApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'PharmaTrack',
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: AppRouter.generateRoute,
+      initialRoute: AppRouter.login,
+    );
+  }
+}
+
+
+
+*/
 
