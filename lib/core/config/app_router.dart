@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pharmatrack/features/auth/presentation/login_screen.dart';
 import 'package:pharmatrack/features/auth/presentation/role_dashboard.dart';
+import 'package:pharmatrack/features/auth/presentation/signup_screen.dart';
 import 'package:pharmatrack/features/customers/presentation/customers_screen.dart';
 import 'package:pharmatrack/features/inventory/presentation/inventory_screen.dart';
 import 'package:pharmatrack/features/pos/presentation/pos_screen.dart';
@@ -9,6 +10,7 @@ import 'package:pharmatrack/features/settings/presentation/settings_screen.dart'
 
 class AppRouter {
   static const String login = '/login';
+  static const String signup = '/signup';
   static const String dashboard = '/dashboard';
   static const String inventory = '/inventory';
   static const String pos = '/pos';
@@ -20,6 +22,8 @@ class AppRouter {
     switch (routeSettings.name) {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case signup:
+        return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case dashboard:
         return MaterialPageRoute(builder: (_) => const RoleDashboard());
       case inventory:
