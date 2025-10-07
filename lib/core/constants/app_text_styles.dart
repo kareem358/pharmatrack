@@ -21,7 +21,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
-  // 📋 Body text
+  //  Body text
   static final body = GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.w400,
@@ -38,7 +38,7 @@ class AppTextStyles {
     color: Colors.black54,
   );
 
-  // 🔘 Buttons or labels
+  //  Buttons or labels
   static final button = GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.w600,
