@@ -39,20 +39,27 @@ class CustomTextField extends StatelessWidget {
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText ?? 'Enter $label',
-            hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            hintStyle:
+            AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
 
-            // Borders (non-const BorderSide to avoid compile-time constant issues)
+            // Updated: using withValues instead of deprecated withOpacity
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.25)),
+              borderSide: BorderSide(
+                color: AppColors.textSecondary.withValues(alpha: 0.25),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
             ),
           ),
         ),
