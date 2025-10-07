@@ -25,7 +25,7 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label
+        // Label text
         Text(
           label,
           style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
