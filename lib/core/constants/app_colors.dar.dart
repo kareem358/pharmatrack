@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 🌿 Central place for PharmaTrack color palette
+/// Central place for PharmaTrack color palette
 class AppColors {
   // 🌤️ Light Theme Base
   static const Color primary = Color(0xFF2E7D32); // Green shade (brand tone)
@@ -12,7 +12,7 @@ class AppColors {
   static const Color error = Color(0xFFD32F2F);
   static const Color success = Color(0xFF388E3C);
 
-  // 🕶️ Optional Dark Theme (for future use)
+  // Optional Dark Theme (for future use)
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color textDark = Color(0xFF212121);
