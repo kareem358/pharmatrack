@@ -15,4 +15,6 @@ class AppColors {
   // 🕶️ Optional Dark Theme (for future use)
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color textDark = Color(0xFF212121);
+  static const Color textLight = Color(0xFF9E9E9E);
 }
