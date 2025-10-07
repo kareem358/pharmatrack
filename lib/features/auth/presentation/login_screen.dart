@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dar.dart';
+
 import '../../../core/constants/app_text_styles.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_text_field.dart';
@@ -15,16 +16,42 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 60),
-              Text('Welcome Back 👋', style: AppTextStyles.heading1),
+            // centered logo
+              Center(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 100,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'PharmaTrack',
+                      style: AppTextStyles.heading1.copyWith(
+                        color: AppColors.primary,
+                        fontSize: 26,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 48),
+
+              // 🔹 Welcome Text
+              Text('Welcome Back 👋', style: AppTextStyles.heading2),
               const SizedBox(height: 8),
-              Text('Login to your PharmaTrack account', style: AppTextStyles.caption),
+              Text(
+                'Login to your PharmaTrack account',
+                style: AppTextStyles.caption,
+              ),
               const SizedBox(height: 40),
+
+              // input field as a email and pass
               CustomTextField(
                 controller: emailController,
                 label: 'Email',
@@ -38,6 +65,8 @@ class LoginScreen extends StatelessWidget {
                 isPassword: true,
               ),
               const SizedBox(height: 40),
+
+              // login button to the dashboard
               CustomButton(
                 label: 'Login',
                 onPressed: () {
