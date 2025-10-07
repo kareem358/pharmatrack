@@ -1,6 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../constants/app_colors.dar.dart';
+
+class AppTheme {
+  static ThemeData get lightTheme {
+    return ThemeData(
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.background,
+      colorScheme: ColorScheme.light(
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
+        surface: AppColors.surface,
+        error: AppColors.error,
+      ),
+      textTheme: GoogleFonts.poppinsTextTheme(),
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
+/*
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 class AppTheme {
   static final lightTheme = ThemeData(
     primarySwatch: Colors.indigo,
@@ -14,34 +54,6 @@ class AppTheme {
   );
 }
 
-
-
-/*
-import 'package:flutter/material.dart';
-import '../constants/app_colors.dar.dart';
-
-import '../constants/app_text_styles.dart';
-
-class AppTheme {
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-    scaffoldBackgroundColor: Colors.white,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-    ),
-    textTheme: AppTextStyles.textTheme,
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    ),
-  );
-}
 */
+
+
