@@ -12,12 +12,12 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
 
   const CustomTextField({
-    super.key,
     required this.label,
     required this.controller,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
-    this.hintText,
+    this.hintText, super.key,
+
   });
 
   @override
