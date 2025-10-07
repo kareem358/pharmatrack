@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'app_colors.dar.dart';
+
 class AppTextStyles {
  
   static final heading1 = GoogleFonts.poppins(
@@ -14,12 +16,20 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: Colors.black87,
   );
-
+  static final TextStyle title = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textDark,
+  );
   // 📋 Body text
   static final body = GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.w400,
     color: Colors.black87,
+  );
+  static final TextStyle caption = TextStyle(
+    fontSize: 14,
+    color: AppColors.textLight,
   );
 
   static final bodySmall = GoogleFonts.poppins(
