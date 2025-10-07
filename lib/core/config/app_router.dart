@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:pharmatrack/features/auth/presentation/login_screen.dart';
-import 'package:pharmatrack/features/auth/presentation/role_dashboard.dart';
-import 'package:pharmatrack/features/customers/presentation/customers_screen.dart';
-import 'package:pharmatrack/features/inventory/presentation/inventory_screen.dart';
-import 'package:pharmatrack/features/pos/presentation/pos_screen.dart';
-import 'package:pharmatrack/features/reports/presentation/reports_screen.dart';
-import 'package:pharmatrack/features/settings/presentation/settings_screen.dart';
+
 
 class AppRouter {
   static const String login = '/login';
