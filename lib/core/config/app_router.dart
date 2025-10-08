@@ -16,7 +16,7 @@ class AppRouter {
   static const String pos = '/pos';
   static const String customers = '/customers';
   static const String reports = '/reports';
-  static const String settingsRoute = '/settings'; // ✅ renamed to avoid conflict
+  static const String settingsRoute = '/settings';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
