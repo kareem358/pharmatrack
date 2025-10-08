@@ -1,4 +1,3 @@
-//  lib/features/auth/presentation/signup_screen.dart
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dar.dart';
 import '../../../core/constants/app_text_styles.dart';
