@@ -14,7 +14,7 @@ class PharmaTrackApp extends StatelessWidget {
     return MaterialApp(
       title: 'PharmaTrack',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme, // 👈 Apply global theme
+      theme: AppTheme.lightTheme, // Apply global theme
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: AppRouter.login,
     );
