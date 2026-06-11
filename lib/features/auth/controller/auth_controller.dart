@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../data/models/user.dart';
 import '../../../data/services/auth_service.dart';
 
@@ -20,7 +21,7 @@ final currentUserProvider = StateNotifierProvider<CurrentUserNotifier, User?>((r
 });
 
 /// Login state notifier
-class LoginNotifier extends StateNotifier<AsyncValue<User>> {
+class LoginNotifier extends StateNotifier<AsyncValue<User?>> {
   final AuthService _authService;
 
   LoginNotifier(this._authService) : super(const AsyncValue.data(null));
@@ -41,13 +42,13 @@ class LoginNotifier extends StateNotifier<AsyncValue<User>> {
 
 /// Login provider
 final loginProvider =
-    StateNotifierProvider.autoDispose<LoginNotifier, AsyncValue<User>>((ref) {
+    StateNotifierProvider.autoDispose<LoginNotifier, AsyncValue<User?>>((ref) {
   final authService = ref.watch(authServiceProvider);
   return LoginNotifier(authService);
 });
 
 /// Sign up state notifier
-class SignUpNotifier extends StateNotifier<AsyncValue<User>> {
+class SignUpNotifier extends StateNotifier<AsyncValue<User?>> {
   final AuthService _authService;
 
   SignUpNotifier(this._authService) : super(const AsyncValue.data(null));
@@ -72,7 +73,7 @@ class SignUpNotifier extends StateNotifier<AsyncValue<User>> {
 
 /// Sign up provider
 final signUpProvider =
-    StateNotifierProvider.autoDispose<SignUpNotifier, AsyncValue<User>>((ref) {
+    StateNotifierProvider.autoDispose<SignUpNotifier, AsyncValue<User?>>((ref) {
   final authService = ref.watch(authServiceProvider);
   return SignUpNotifier(authService);
 });
