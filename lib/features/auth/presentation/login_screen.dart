@@ -266,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
                     TextButton(
-                      onPressed: loginState.isLoading
+                      onPressed: loginState.uiIsLoading
                           ? null
                           : () {
                               // TODO: Implement forgot password
