@@ -52,17 +52,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     final loginState = ref.read(loginProvider);
-    loginState.whenData((user) {
-      if (user != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: Color(0xFF388E3C),
-          ),
-        );
-        Navigator.of(context).pushReplacementNamed('/dashboard');
-      }
-    });
+    
+    loginState.when(
+      data: (user) {
+        if (user != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login successful!'),
+              backgroundColor: Color(0xFF388E3C),
+            ),
+          );
+          Navigator.of(context).pushReplacementNamed('/dashboard');
+        }
+      },
+      loading: () {
+        // Loading state is handled by the UI
+      },
+      error: (error, stackTrace) {
+        debugPrint('Login error: $error');
+        // Error is displayed in the UI through uiHasError and uiErrorMessage
+      },
+    );
   }
 
   @override
@@ -313,6 +323,87 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             'Login',
                             style: AppTextStyles.button,
                           ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // 🔹 Divider or Separator
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: Colors.grey[300])),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Or continue with',
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: Colors.grey[300])),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // 🔹 Google Sign-In Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: loginState.uiIsLoading
+                        ? null
+                        : () async {
+                            FocusScope.of(context).unfocus();
+                            await ref
+                                .read(googleSignInProvider.notifier)
+                                .signInWithGoogle();
+
+                            if (!mounted) return;
+
+                            final googleSignInState =
+                                ref.read(googleSignInProvider);
+                            googleSignInState.when(
+                              data: (user) {
+                                if (user != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Google login successful!'),
+                                      backgroundColor:
+                                          Color(0xFF388E3C),
+                                    ),
+                                  );
+                                  Navigator.of(context)
+                                      .pushReplacementNamed(
+                                          '/dashboard');
+                                }
+                              },
+                              loading: () {},
+                              error: (error, stackTrace) {
+                                debugPrint(
+                                    'Google Sign-In error: $error');
+                              },
+                            );
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black87,
+                      disabledBackgroundColor: Colors.grey[200],
+                      side: BorderSide(
+                        color: Colors.grey[300]!,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.mail_outline),
+                    label: Text(
+                      'Sign in with Google',
+                      style: AppTextStyles.button.copyWith(
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
