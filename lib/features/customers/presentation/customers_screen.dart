@@ -5,9 +5,21 @@ class CustomersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Customers')),
-      body: const Center(child: Text('Customers Screen')),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Customer Management',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 24),
+          const Center(
+            child: Text('Customers Screen - Coming Soon'),
+          ),
+        ],
+      ),
     );
   }
 }
