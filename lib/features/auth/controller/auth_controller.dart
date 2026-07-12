@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../../data/models/user.dart';
@@ -47,6 +49,27 @@ final loginProvider =
   return LoginNotifier(authService);
 });
 
+/// Google Sign-In state notifier
+class GoogleSignInNotifier extends StateNotifier<AsyncValue<User?>> {
+  final AuthService _authService;
+
+  GoogleSignInNotifier(this._authService) : super(const AsyncValue.data(null));
+
+  Future<void> signInWithGoogle() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => _authService.signInWithGoogle(),
+    );
+  }
+}
+
+/// Google Sign-In provider
+final googleSignInProvider =
+    StateNotifierProvider.autoDispose<GoogleSignInNotifier, AsyncValue<User?>>((ref) {
+  final authService = ref.watch(authServiceProvider);
+  return GoogleSignInNotifier(authService);
+});
+
 /// Sign up state notifier
 class SignUpNotifier extends StateNotifier<AsyncValue<User?>> {
   final AuthService _authService;
@@ -81,15 +104,24 @@ final signUpProvider =
 /// Current user notifier
 class CurrentUserNotifier extends StateNotifier<User?> {
   final AuthService _authService;
+  StreamSubscription? _subscription;
 
   CurrentUserNotifier(this._authService) : super(null) {
     _init();
   }
 
   void _init() {
-    _authService.authStateChanges.listen((user) {
-      state = user;
+    _subscription = _authService.authStateChanges.listen((user) {
+      Future.microtask(() {
+        state = user;
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   Future<void> signOut() async {
