@@ -33,7 +33,7 @@ class AppRouter {
       case customers:
         return MaterialPageRoute(builder: (_) => const CustomersScreen());
       case reports:
-        return MaterialPageRoute(builder: (_) => const ReportsScreen());
+        return MaterialPageRoute(builder: (_) => const ReportScreen());
       case settingsRoute: // ✅ use new constant
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
