@@ -33,7 +33,7 @@ class PharmaTrackApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       onGenerateRoute: AppRouter.generateRoute,
-      initialRoute: AppRouter.login,
+      initialRoute: AppRouter.dashboard,
     );
   }
 }
