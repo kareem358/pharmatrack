@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user.dart';
 
 /// Custom exception for authentication errors
@@ -18,6 +19,7 @@ class AuthException implements Exception {
 /// Authentication service handling Firebase Auth operations
 class AuthService {
   final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   /// Get current authenticated user
   User? get currentUser {
@@ -136,10 +138,51 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
     } catch (e) {
       throw AuthException(
         message: 'Sign out failed: ${e.toString()}',
         code: 'signout_error',
+      );
+    }
+  }
+
+  /// Google Sign-In with Gmail
+  Future<User> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw AuthException(
+          message: 'Google Sign-In cancelled',
+          code: 'google_signin_cancelled',
+        );
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credentials = await _firebaseAuth.signInWithCredential(
+        fb.GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        ),
+      );
+
+      if (credentials.user == null) {
+        throw AuthException(
+          message: 'Google Sign-In failed: User not found',
+          code: 'google_signin_error',
+        );
+      }
+
+      return _convertFirebaseUserToUser(credentials.user!);
+    } on fb.FirebaseAuthException catch (e) {
+      throw _handleFirebaseException(e);
+    } catch (e) {
+      throw AuthException(
+        message: 'Google Sign-In failed: ${e.toString()}',
+        code: 'google_signin_error',
       );
     }
   }
