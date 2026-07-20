@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "419963569611",
+    "project_id": "pharmatrack-190a8",
+    "storage_bucket": "pharmatrack-190a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419963569611:android:c39ff3a001a36eab69e24e",
+        "android_client_info": {
+          "package_name": "com.kareemullah.pharmatrack.pharmatrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4Rww7ZRPnB26z3JxzbGUTYuCKuFh977E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
