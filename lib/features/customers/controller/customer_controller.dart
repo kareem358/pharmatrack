@@ -8,12 +8,22 @@ class CustomerState {
   final CustomerPeriod period;
   final bool isLoading;
   final String? errorMessage;
+  
+  // Overall stats
+  final int totalCustomers;
+  final double overallRevenue;
+  final double periodRevenue;
+  final int totalActiveCustomers;
 
-  CustomerState({
+  const CustomerState({
     required this.summaries,
     required this.period,
     this.isLoading = false,
     this.errorMessage,
+    this.totalCustomers = 0,
+    this.overallRevenue = 0,
+    this.periodRevenue = 0,
+    this.totalActiveCustomers = 0,
   });
 
   CustomerState copyWith({
@@ -21,62 +31,111 @@ class CustomerState {
     CustomerPeriod? period,
     bool? isLoading,
     String? errorMessage,
+    int? totalCustomers,
+    double? overallRevenue,
+    double? periodRevenue,
+    int? totalActiveCustomers,
   }) {
     return CustomerState(
       summaries: summaries ?? this.summaries,
       period: period ?? this.period,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
+      totalCustomers: totalCustomers ?? this.totalCustomers,
+      overallRevenue: overallRevenue ?? this.overallRevenue,
+      periodRevenue: periodRevenue ?? this.periodRevenue,
+      totalActiveCustomers: totalActiveCustomers ?? this.totalActiveCustomers,
     );
   }
 }
 
-/// Professional Notifier for Customer Management
 class CustomerController extends Notifier<CustomerState> {
   @override
   CustomerState build() {
-    // Initial state
-    final initialState = CustomerState(
+    Future.microtask(() => refresh());
+    
+    return const CustomerState(
       summaries: [],
       period: CustomerPeriod.all,
       isLoading: true,
     );
-
-    // Load data immediately
-    _loadSummaries(initialState.period);
-
-    return initialState;
   }
 
-  Future<void> _loadSummaries(CustomerPeriod period) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+  Future<void> refresh() async {
+    await _fetchData(state.period);
+  }
+
+  Future<void> _fetchData(CustomerPeriod period) async {
+    state = state.copyWith(isLoading: true, errorMessage: null, period: period);
+    
     try {
-      final data = await DBHelper.instance.getCustomerSummaries(period.name);
-      state = state.copyWith(summaries: data, isLoading: false);
+      // 1. Fetch All-Time summaries for the table
+      final allSummaries = await DBHelper.instance.getCustomerSummaries('all');
+      
+      // 2. Fetch Period-specific data for revenue card
+      final periodData = await DBHelper.instance.getCustomerSummaries(period.name);
+      double pRevenue = 0;
+      for (var row in periodData) {
+        pRevenue += (row['total_spent'] ?? 0).toDouble();
+      }
+
+      // 3. Overall Stats
+      int totalCust = allSummaries.length;
+      double totalRev = 0;
+      int activeCust = 0;
+      
+      for (var row in allSummaries) {
+        double spent = (row['total_spent'] ?? 0).toDouble();
+        totalRev += spent;
+        if ((row['orders_count'] ?? 0) > 0) {
+          activeCust++;
+        }
+      }
+
+      state = state.copyWith(
+        summaries: allSummaries,
+        isLoading: false,
+        totalCustomers: totalCust,
+        overallRevenue: totalRev,
+        periodRevenue: pRevenue,
+        totalActiveCustomers: activeCust,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoading: false, 
-        errorMessage: 'Failed to load customers: ${e.toString()}'
+        errorMessage: 'Error: ${e.toString()}',
       );
     }
   }
 
-  void loadSummaries() {
-    _loadSummaries(state.period);
-  }
-
   void setPeriod(CustomerPeriod period) {
-    if (state.period == period) return;
-    state = state.copyWith(period: period);
-    _loadSummaries(period);
+    if (state.period == period && !state.isLoading) return;
+    _fetchData(period);
   }
 
-  /// Fetches specific transaction history for a customer
-  Future<List<Map<String, dynamic>>> getDetailedHistory(String phone) async {
+  Future<List<Map<String, dynamic>>> getDetailedHistory(int customerId) async {
     try {
-      return await DBHelper.instance.getInvoicesForCustomer(phone, state.period.name);
+      // Use ID for accurate individual history
+      return await DBHelper.instance.getInvoicesForCustomer(customerId, 'all');
     } catch (e) {
       return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllInvoices() async {
+    try {
+      return await DBHelper.instance.getInvoicesWithItems(0);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<void> deleteInvoice(int invoiceId) async {
+    try {
+      await DBHelper.instance.deleteInvoice(invoiceId);
+      await refresh();
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to delete invoice: ${e.toString()}');
     }
   }
 }
