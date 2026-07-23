@@ -50,11 +50,13 @@ class Medicine {
   });
 
   bool get isExpired => expiryDate.isBefore(DateTime.now());
-  bool get isLowStock => stock <= reorderLevel;
+  bool get isLowStock => stock <= reorderLevel && stock > 0;
+  bool get isOutOfStock => stock <= 0;
   
   MedicineStatus get computedStatus {
+    if (status == MedicineStatus.discontinued) return MedicineStatus.discontinued;
     if (isExpired) return MedicineStatus.expired;
-    if (isLowStock) return MedicineStatus.lowStock;
+    if (isLowStock || isOutOfStock) return MedicineStatus.lowStock;
     return MedicineStatus.active;
   }
 

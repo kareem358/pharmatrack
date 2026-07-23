@@ -70,6 +70,21 @@ class MedicineNotifier extends AsyncNotifier<List<Medicine>> {
     });
   }
 
+  Future<void> addStock(String id, int quantity) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final rows = await DBHelper.instance.getMedicinesByIds([id]);
+      if (rows.isNotEmpty) {
+        final currentStock = (rows.first['stock'] as int?) ?? 0;
+        await DBHelper.instance.updateMedicine(id, {
+          'stock': currentStock + quantity,
+          'updated_at': DateTime.now().millisecondsSinceEpoch,
+        });
+      }
+      return _fetchMedicines();
+    });
+  }
+
   Future<void> deleteMedicine(String id) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -102,7 +117,7 @@ class StatusFilterNotifier extends Notifier<MedicineStatus?> {
 }
 final selectedStatusProvider = NotifierProvider<StatusFilterNotifier, MedicineStatus?>(StatusFilterNotifier.new);
 
-final filteredMedicinesProvider = Provider<AsyncValue<List<Medicine>>>((ref) {
+final inventoryFilteredMedicinesProvider = Provider<AsyncValue<List<Medicine>>>((ref) {
   final medicinesState = ref.watch(medicineListProvider);
   final searchQuery = ref.watch(searchQueryProvider);
   final selectedCategory = ref.watch(selectedCategoryProvider);
@@ -119,7 +134,7 @@ final filteredMedicinesProvider = Provider<AsyncValue<List<Medicine>>>((ref) {
       filtered = filtered.where((m) => m.category == selectedCategory).toList();
     }
     if (selectedStatus != null) {
-      filtered = filtered.where((m) => m.status == selectedStatus).toList();
+      filtered = filtered.where((m) => m.computedStatus == selectedStatus).toList();
     }
     return filtered;
   });
