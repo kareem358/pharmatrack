@@ -3,10 +3,10 @@ import '../../inventory/models/medicine.dart';
 import '../../customers/db_helper.dart';
 
 enum ReportTimeRange {
-  last7Days('Last 7 Days'),
-  last30Days('Last 30 Days'),
-  thisMonth('This Month'),
-  thisYear('This Year');
+  daily('Daily Trend'),
+  weekly('Weekly Trend'),
+  monthly('Monthly Trend'),
+  yearly('Yearly Trend');
 
   final String label;
   const ReportTimeRange(this.label);
@@ -42,8 +42,9 @@ class SalesTrendPoint {
 
 class CategoryRevenue {
   final String category;
+  final double amount;
   final double percentage;
-  CategoryRevenue(this.category, this.percentage);
+  CategoryRevenue(this.category, this.amount, this.percentage);
 }
 
 class TopMedicine {
@@ -97,44 +98,109 @@ class ReportState {
 class ReportController extends AsyncNotifier<ReportState> {
   @override
   Future<ReportState> build() async {
-    return _fetchData(ReportTimeRange.last7Days);
+    return _fetchData(ReportTimeRange.daily);
   }
 
   Future<ReportState> _fetchData(ReportTimeRange range) async {
     final now = DateTime.now();
     DateTime start;
+    DateTime prevStart;
+    int daysInRange;
+    String groupBy;
+
     switch (range) {
-      case ReportTimeRange.last7Days:
-        start = now.subtract(const Duration(days: 7));
+      case ReportTimeRange.daily:
+        start = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
+        prevStart = start.subtract(const Duration(days: 7));
+        daysInRange = 7;
+        groupBy = 'day';
         break;
-      case ReportTimeRange.last30Days:
-        start = now.subtract(const Duration(days: 30));
+      case ReportTimeRange.weekly:
+        start = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 27));
+        prevStart = start.subtract(const Duration(days: 28));
+        daysInRange = 28;
+        groupBy = 'day';
         break;
-      case ReportTimeRange.thisMonth:
-        start = DateTime(now.year, now.month, 1);
+      case ReportTimeRange.monthly:
+        start = DateTime(now.year, now.month - 5, 1);
+        prevStart = DateTime(now.year, now.month - 11, 1);
+        daysInRange = 180;
+        groupBy = 'month';
         break;
-      case ReportTimeRange.thisYear:
+      case ReportTimeRange.yearly:
         start = DateTime(now.year, 1, 1);
+        prevStart = DateTime(now.year - 1, 1, 1);
+        daysInRange = 365;
+        groupBy = 'month';
         break;
     }
 
     final sinceMs = start.millisecondsSinceEpoch;
+    final prevSinceMs = prevStart.millisecondsSinceEpoch;
+
+    // Current period data
     final summaryRow = await DBHelper.instance.getSalesSummary(sinceMs);
     final topRows = await DBHelper.instance.getTopSellingMedicines(sinceMs, limit: 10);
+    final trendRows = await DBHelper.instance.getSalesTrend(sinceMs, groupBy);
+    final catRows = await DBHelper.instance.getCategoryRevenue(sinceMs);
 
+    // Previous period data for growth calculation
+    final prevSummaryRow = await DBHelper.instance.getSalesSummary(prevSinceMs);
+    
     final totalSales = (summaryRow['total_sales'] as num?)?.toDouble() ?? 0.0;
     final transactions = (summaryRow['transactions'] as int?) ?? 0;
+    
+    final totalSalesIncludingPrev = (prevSummaryRow['total_sales'] as num?)?.toDouble() ?? 0.0;
+    final prevTotalSales = totalSalesIncludingPrev - totalSales;
+    final salesGrowth = prevTotalSales > 0 ? ((totalSales - prevTotalSales) / prevTotalSales) * 100 : 0.0;
+
+    final totalTransIncludingPrev = (prevSummaryRow['transactions'] as int?) ?? 0;
+    final prevTransactions = totalTransIncludingPrev - transactions;
+    final transGrowth = prevTransactions > 0 ? ((transactions - prevTransactions) / prevTransactions) * 100 : 0.0;
+
+    final avgDaily = daysInRange > 0 ? totalSales / daysInRange : totalSales;
+    final prevAvgDaily = daysInRange > 0 ? prevTotalSales / daysInRange : prevTotalSales;
+    final avgDailyGrowth = prevAvgDaily > 0 ? ((avgDaily - prevAvgDaily) / prevAvgDaily) * 100 : 0.0;
+
+    final avgTicket = transactions > 0 ? totalSales / transactions : 0.0;
+    final prevAvgTicket = prevTransactions > 0 ? prevTotalSales / prevTransactions : 0.0;
+    final avgTicketGrowth = prevAvgTicket > 0 ? ((avgTicket - prevAvgTicket) / prevAvgTicket) * 100 : 0.0;
 
     final summary = ReportSummary(
       totalSales: totalSales,
-      salesGrowth: 0,
+      salesGrowth: double.parse(salesGrowth.toStringAsFixed(1)),
       totalTransactions: transactions,
-      transactionsGrowth: 0,
-      avgDailySales: 0,
-      dailySalesGrowth: 0,
-      avgTransaction: transactions > 0 ? totalSales / transactions : 0.0,
-      avgTransactionGrowth: 0,
+      transactionsGrowth: double.parse(transGrowth.toStringAsFixed(1)),
+      avgDailySales: avgDaily,
+      dailySalesGrowth: double.parse(avgDailyGrowth.toStringAsFixed(1)),
+      avgTransaction: avgTicket,
+      avgTransactionGrowth: double.parse(avgTicketGrowth.toStringAsFixed(1)),
     );
+
+    final trend = trendRows.map((r) {
+      final periodStr = r['period'] as String;
+      DateTime date;
+      if (groupBy == 'month') {
+        final parts = periodStr.split('-');
+        date = DateTime(int.parse(parts[0]), int.parse(parts[1]));
+      } else {
+        date = DateTime.parse(periodStr);
+      }
+      return SalesTrendPoint(
+        date,
+        (r['amount'] as num?)?.toDouble() ?? 0.0,
+      );
+    }).toList();
+
+    final totalCatRevenue = catRows.fold<double>(0, (sum, r) => sum + ((r['amount'] as num?)?.toDouble() ?? 0.0));
+    final categories = catRows.map((r) {
+      final amount = (r['amount'] as num?)?.toDouble() ?? 0.0;
+      return CategoryRevenue(
+        r['category'] ?? 'Other',
+        amount,
+        totalCatRevenue > 0 ? (amount / totalCatRevenue) * 100 : 0.0,
+      );
+    }).toList();
 
     final top = topRows.map((r) {
       final stock = (r['stock'] as int?) ?? 0;
@@ -154,8 +220,8 @@ class ReportController extends AsyncNotifier<ReportState> {
     return ReportState(
       timeRange: range,
       summary: summary,
-      salesTrend: [],
-      categoryRevenue: [],
+      salesTrend: trend,
+      categoryRevenue: categories,
       topMedicines: top,
     );
   }
