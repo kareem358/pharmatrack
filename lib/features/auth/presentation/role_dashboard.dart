@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:pharmatrack/core/constants/app_colors.dar.dart';
 import 'package:pharmatrack/features/inventory/presentation/inventory_screen.dart';
 import 'package:pharmatrack/features/pos/presentation/pos_screen.dart';
 import 'package:pharmatrack/features/customers/presentation/customers_screen.dart';
 import 'package:pharmatrack/features/reports/presentation/reports_screen.dart';
 import 'package:pharmatrack/features/settings/presentation/settings_screen.dart';
+import '../../dashboard/controller/dashboard_controller.dart';
 
 /// Modern Notifier to manage the dashboard's active index
 class DashboardIndexNotifier extends Notifier<int> {
@@ -152,6 +154,8 @@ class _DashboardHome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(dashboardStatsProvider);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         int statCrossAxisCount = 4;
@@ -172,53 +176,87 @@ class _DashboardHome extends ConsumerWidget {
           actionAspectRatio = 1.6;
         }
 
-        return SingleChildScrollView( 
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: statCrossAxisCount,
-                childAspectRatio: statAspectRatio,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                children: [
-                  _statCard("Today's Sales", "Rs. 45,230", Icons.account_balance_wallet_rounded, "+12.5%", Colors.blue),
-                  _statCard("Low Stock Items", "23", Icons.inventory_rounded, "-5%", Colors.red),
-                  _statCard("Total Medicines", "1,234", Icons.medical_services_rounded, "+8%", Colors.green),
-                  _statCard("Monthly Revenue", "Rs. 1.25M", Icons.trending_up_rounded, "+15%", Colors.deepPurple),
-                ],
-              ),
-              const SizedBox(height: 40),
-              const Text(
-                "Quick Management",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
-              ),
-              const SizedBox(height: 20),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: actionCrossAxisCount,
-                childAspectRatio: actionAspectRatio,
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
-                children: [
-                  _actionCard(ref, 1, "Inventory", "Manage stock levels, add new medicines, and track batch expiries.", Icons.inventory_2_outlined, Colors.blue),
-                  _actionCard(ref, 2, "Sales (POS)", "Create new transactions, generate professional Rs. invoices, and handle payments.", Icons.point_of_sale_rounded, Colors.green),
-                  _actionCard(ref, 3, "Customer Portal", "Maintain customer records, track credit (Udhaar), and purchase history.", Icons.people_outline_rounded, Colors.orange),
-                  _actionCard(ref, 4, "Business Reports", "Analyze daily sales performance, tax summaries, and financial analytics.", Icons.bar_chart_rounded, Colors.purple),
-                ],
-              ),
-            ],
+        return statsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error loading stats: $err')),
+          data: (stats) => SingleChildScrollView( 
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: statCrossAxisCount,
+                  childAspectRatio: statAspectRatio,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  children: [
+                    _statCard(
+                      "Today's Sales", 
+                      "Rs. ${NumberFormat('#,###').format(stats.todaySales)}", 
+                      Icons.account_balance_wallet_rounded, 
+                      "${stats.todayGrowth >= 0 ? '+' : ''}${stats.todayGrowth}%", 
+                      Colors.blue,
+                      "vs yesterday"
+                    ),
+                    _statCard(
+                      "Low Stock Items", 
+                      "${stats.lowStockCount}", 
+                      Icons.inventory_rounded, 
+                      "${stats.lowStockGrowth >= 0 ? '+' : ''}${stats.lowStockGrowth}%", 
+                      Colors.red,
+                      "needs attention"
+                    ),
+                    _statCard(
+                      "Total Medicines", 
+                      "${stats.totalMedicines}", 
+                      Icons.medical_services_rounded, 
+                      "${stats.totalMedicinesGrowth >= 0 ? '+' : ''}${stats.totalMedicinesGrowth}%", 
+                      Colors.green,
+                      "in inventory"
+                    ),
+                    _statCard(
+                      "Monthly Revenue", 
+                      "Rs. ${NumberFormat('#,###').format(stats.monthlyRevenue)}", 
+                      Icons.trending_up_rounded, 
+                      "${stats.monthlyGrowth >= 0 ? '+' : ''}${stats.monthlyGrowth}%", 
+                      Colors.deepPurple,
+                      "this month"
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                const Text(
+                  "Quick Management",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                ),
+                const SizedBox(height: 20),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: actionCrossAxisCount,
+                  childAspectRatio: actionAspectRatio,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  children: [
+                    _actionCard(ref, 1, "Inventory", "Manage stock levels, add new medicines, and track batch expiries.", Icons.inventory_2_outlined, Colors.blue),
+                    _actionCard(ref, 2, "Sales (POS)", "Create new transactions, generate professional Rs. invoices, and handle payments.", Icons.point_of_sale_rounded, Colors.green),
+                    _actionCard(ref, 3, "Customer Portal", "Maintain customer records, track credit (Udhaar), and purchase history.", Icons.people_outline_rounded, Colors.orange),
+                    _actionCard(ref, 4, "Business Reports", "Analyze daily sales performance, tax summaries, and financial analytics.", Icons.bar_chart_rounded, Colors.purple),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _statCard(String title, String value, IconData icon, String trend, Color color) {
+  Widget _statCard(String title, String value, IconData icon, String trend, Color color, String label) {
+    final bool isPositive = !trend.contains('-');
+    
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -226,7 +264,7 @@ class _DashboardHome extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -239,7 +277,7 @@ class _DashboardHome extends ConsumerWidget {
               Flexible(child: Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                 child: Icon(icon, color: color, size: 18),
               ),
             ],
@@ -252,11 +290,11 @@ class _DashboardHome extends ConsumerWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              Icon(Icons.north_east_rounded, size: 12, color: trend.startsWith('+') ? Colors.green : Colors.red),
+              Icon(isPositive ? Icons.north_east_rounded : Icons.south_east_rounded, size: 12, color: isPositive ? Colors.green : Colors.red),
               const SizedBox(width: 4),
-              Text(trend, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: trend.startsWith('+') ? Colors.green : Colors.red)),
+              Text(trend, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isPositive ? Colors.green : Colors.red)),
               const SizedBox(width: 4),
-              Text("vs last month", style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
             ],
           ),
         ],
@@ -275,7 +313,7 @@ class _DashboardHome extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFE5E7EB)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 8)),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 15, offset: const Offset(0, 8)),
           ],
         ),
         child: Column(
@@ -283,7 +321,7 @@ class _DashboardHome extends ConsumerWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(14)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)),
               child: Icon(icon, color: color, size: 28),
             ),
             const SizedBox(height: 20),
